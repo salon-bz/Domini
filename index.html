@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Descargas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #0f172a;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      justify-items: center;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      width: 300px;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .card:hover { transform: scale(1.05); }
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .card h3 { margin: 15px 0; }
+    .btn {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 10px;
+      transition: background 0.3s;
+    }
+    .btn:hover { background: #2563eb; }
+
+    /* Popup */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    .popup {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      animation: popup 0.3s ease;
+    }
+    @keyframes popup {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .popup h2 { margin-bottom: 15px; }
+    .popup .actions {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .popup button {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.3s;
+    }
+    .popup button:hover { background: #2563eb; }
+    .popup button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>𝐃𝐎𝐌𝐈𝐍𝐈𝐂𝐀𝐍𝐈𝐓𝐎 𝐌𝐎𝐃𝐙 𝐗𝐈𝐓 🔥😩</h1>
+  <div class="grid" id="posts"></div>
+
+  <div class="overlay" id="overlay">
+    <div class="popup">
+      <h2>Es obligatorio cumplir estos requisitos</h2>
+      <div id="tasks" class="actions"></div>
+      <button id="downloadBtn" disabled>Ir a Descargar</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQAfdb3O0GzkQTrpmqUmFq38szrf3PJhw",
+      authDomain: "domini-6fae2.firebaseapp.com",
+      projectId: "domini-6fae2",
+      storageBucket: "domini-6fae2.firebasestorage.app",
+      messagingSenderId: "990218506087",
+      appId: "1:990218506087:web:a577eed88dea8882c0e9c2",
+      databaseURL: "https://domini-6fae2-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const postsContainer = document.getElementById('posts');
+    const overlay = document.getElementById('overlay');
+    const tasksContainer = document.getElementById('tasks');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    onValue(ref(db, 'posts'), (snapshot) => {
+      postsContainer.innerHTML = '';
+      snapshot.forEach(child => {
+        const data = child.val();
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${data.image}" alt="">
+          <h3>${data.title}</h3>
+          <button class="btn">Descargar</button>
+        `;
+        card.querySelector('.btn').addEventListener('click', () => openTasks(data));
+        postsContainer.appendChild(card);
+      });
+    });
+
+    function openTasks(data) {
+      overlay.style.display = 'flex';
+      tasksContainer.innerHTML = '';
+      downloadBtn.disabled = true;
+      let completed = 0;
+      const tasks = data.tasks || [];
+
+      tasks.forEach((t, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = t.name;
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault(); // evita recarga
+          window.open(t.link, '_blank', 'noopener,noreferrer'); // abre en nueva pestaña
+          btn.disabled = true;
+          btn.style.background = '#16a34a'; // verde al completar
+          completed++;
+          if (completed >= tasks.length) {
+            downloadBtn.disabled = false;
+          }
+        });
+
+        tasksContainer.appendChild(btn);
+      });
+
+      downloadBtn.onclick = () => {
+        window.open(data.download, '_blank');
+        overlay.style.display = 'none';
+      };
+    }
+
+    // Cerrar el popup si se hace clic afuera
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
