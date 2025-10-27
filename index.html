@@ -6,100 +6,278 @@
   <title>Descargas</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    /* VARIABLES NEÓN */
+    :root {
+      --neon-blue: #3b82f6;
+      --neon-pink: #ec4899;
+      --neon-green: #10b981;
+      --neon-yellow: #facc15;
+      --neon-shadow-blue: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px rgba(59, 130, 246, 0.4);
+      --neon-shadow-pink: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink), 0 0 40px rgba(236, 72, 153, 0.4);
+      --neon-shadow-green: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 40px rgba(16, 185, 129, 0.4);
+      --dark-bg: #030712;
+      --neon-purple: #9333ea; /* Nuevo color para el contador de visitantes */
+    }
+
+    /* Fondo de Partículas Neón */
     body {
-      background: #0f172a;
+      background: var(--dark-bg);
       font-family: 'Poppins', sans-serif;
       color: #fff;
       margin: 0;
       padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
     }
+
+    /* Estilos del contador de visitantes */
+    #visitor-counter {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--neon-purple);
+      text-shadow: 0 0 5px var(--neon-purple), 0 0 10px var(--neon-purple);
+      border: 1px solid var(--neon-purple);
+      border-radius: 8px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Animación de Partículas (Sin cambios) */
+    .neon-particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(0.5px);
+    }
+
+    .particle {
+      position: absolute;
+      background: var(--neon-blue);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float-particle 10s infinite ease-in-out alternate, glow-particle 4s infinite alternate;
+    }
+
+    @keyframes float-particle {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(20vw, 40vh); }
+    }
+
+    @keyframes glow-particle {
+      0% { box-shadow: 0 0 5px var(--neon-blue); }
+      50% { box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); }
+      100% { box-shadow: 0 0 5px var(--neon-blue); }
+    }
+    
+    /* Título Neón (Sin cambios) */
     h1 {
       text-align: center;
       margin-bottom: 30px;
+      color: var(--neon-pink);
+      text-shadow: var(--neon-shadow-pink);
+      animation: pulse-title 3s infinite alternate;
     }
+
+    @keyframes pulse-title {
+        0% { text-shadow: var(--neon-shadow-pink); }
+        100% { text-shadow: 0 0 10px var(--neon-pink), 0 0 30px var(--neon-pink), 0 0 60px rgba(236, 72, 153, 0.6); }
+    }
+    
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      gap: 30px;
       justify-items: center;
     }
+    
+    /* Tarjeta Neón - Mantiene diseño para solo texto */
     .card {
-      background: #1e293b;
+      background: rgba(30, 41, 59, 0.3);
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      border: 2px solid var(--neon-blue);
+      box-shadow: var(--neon-shadow-blue);
       width: 300px;
       text-align: center;
-      transition: transform 0.3s;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+      padding: 20px 10px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 150px;
+      position: relative; /* Necesario para posicionar el contador de descargas */
     }
-    .card:hover { transform: scale(1.05); }
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
+
+    .card:hover {
+        transform: scale(1.03) translateY(-5px);
+        box-shadow: 0 0 15px var(--neon-green), 0 0 30px var(--neon-green);
+        border-color: var(--neon-green);
     }
-    .card h3 { margin: 15px 0; }
+
+    .card h3 {
+      margin: 15px 0 20px 0;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 5px var(--neon-yellow);
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+    }
+    
+    /* Estilo del contador de descargas por post */
+    .download-count {
+      color: var(--neon-green);
+      font-weight: 600;
+      margin-bottom: 5px;
+      text-shadow: 0 0 3px var(--neon-green);
+      font-size: 0.9em;
+    }
+
+    /* Botón Flotante Neón de Descarga (Sin cambios) */
     .btn {
       display: inline-block;
-      background: #3b82f6;
+      background: var(--neon-blue);
       color: white;
       padding: 10px 15px;
       border-radius: 8px;
       text-decoration: none;
-      margin: 10px;
-      transition: background 0.3s;
+      margin: 10px auto 0 auto;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.8s ease-in-out;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--neon-shadow-blue);
+      animation: float-btn 3s infinite ease-in-out alternate;
+      font-weight: 600;
+      width: 80%;
     }
-    .btn:hover { background: #2563eb; }
 
-    /* Popup */
+    .btn:hover {
+        background: #fff;
+        color: var(--dark-bg);
+        box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue);
+        transform: scale(1.05) translateY(-2px);
+    }
+
+    @keyframes float-btn {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0px); }
+    }
+
+    /* Popup Neón (Sin cambios) */
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.9);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 10;
+      backdrop-filter: blur(3px);
     }
+
     .popup {
-      background: #1e293b;
+      background: var(--dark-bg);
       border-radius: 16px;
-      padding: 20px;
+      padding: 30px;
       text-align: center;
       width: 90%;
-      max-width: 400px;
+      max-width: 450px;
+      border: 3px solid var(--neon-pink);
+      box-shadow: var(--neon-shadow-pink);
       animation: popup 0.3s ease;
     }
+    
     @keyframes popup {
       from { transform: scale(0.8); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
-    .popup h2 { margin-bottom: 15px; }
+
+    .popup h2 {
+      margin-bottom: 20px;
+      color: var(--neon-pink);
+      text-shadow: 0 0 5px var(--neon-pink);
+    }
+
     .popup .actions {
-      margin: 15px 0;
+      margin: 20px 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
     }
+
+    /* Botones de Tareas Neón y Flotantes (Sin cambios) */
     .popup button {
-      background: #3b82f6;
+      background: var(--neon-green);
       border: none;
-      color: #fff;
-      padding: 10px;
-      border-radius: 8px;
+      color: var(--dark-bg);
+      padding: 12px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 15px;
-      transition: background 0.3s;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.8s ease-in-out;
+      box-shadow: var(--neon-shadow-green);
+      animation: float-btn 3s infinite ease-in-out alternate;
     }
-    .popup button:hover { background: #2563eb; }
+    
+    .popup button:hover {
+        background: #fff;
+        box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 40px var(--neon-green);
+        color: var(--dark-bg);
+        transform: scale(1.05) translateY(-2px);
+    }
+    
+    .popup button[style*="16a34a"] {
+        background: #16a34a !important;
+        color: white !important;
+        box-shadow: 0 0 5px #16a34a, 0 0 10px #16a34a;
+        animation: none;
+        transform: none;
+        cursor: not-allowed;
+    }
+    
+    /* Botón de "Ir a Descargar" */
+    #downloadBtn {
+        background: var(--neon-yellow);
+        color: var(--dark-bg);
+        box-shadow: 0 0 5px var(--neon-yellow), 0 0 10px var(--neon-yellow), 0 0 20px var(--neon-yellow);
+        animation: float-btn 4s infinite ease-in-out alternate;
+    }
+    
+    /* Botón deshabilitado */
     .popup button:disabled {
-      background: gray;
+      background: #4b5563 !important;
       cursor: not-allowed;
+      box-shadow: none !important;
+      transform: none !important;
+      animation: none !important;
+      color: #9ca3af !important;
+    }
+    
+    #downloadBtn:disabled {
+        background: #4b5563 !important;
+        color: #9ca3af !important;
+        box-shadow: none !important;
+        transform: none !important;
+        animation: none !important;
     }
   </style>
 </head>
 <body>
+  <div class="neon-particles" id="neonParticles"></div>
+
   <h1>𝐃𝐎𝐌𝐈𝐍𝐈𝐂𝐀𝐍𝐈𝐓𝐎 𝐌𝐎𝐃𝐙 𝐗𝐈𝐓 🔥😩</h1>
+
+  <div id="visitor-counter">Cargando visitantes...</div>
+
   <div class="grid" id="posts"></div>
 
   <div class="overlay" id="overlay">
@@ -110,9 +288,57 @@
     </div>
   </div>
 
+<script>
+    // Script para crear las partículas de fondo de forma dinámica (Mantenido)
+    document.addEventListener('DOMContentLoaded', () => {
+      const particlesContainer = document.getElementById('neonParticles');
+      const particleColors = [
+          'var(--neon-blue)',
+          'var(--neon-pink)',
+          'var(--neon-green)',
+          'var(--neon-yellow)'
+      ];
+      const numParticles = 40; 
+
+      for (let i = 0; i < numParticles; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+
+        const size = Math.random() * 5 + 2; 
+        const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+        const duration = Math.random() * 8 + 8; 
+        const delay = Math.random() * -duration; 
+        const top = Math.random() * 100;
+        const left = Math.random() * 100;
+
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = color;
+        particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+        particle.style.top = `${top}vh`;
+        particle.style.left = `${left}vw`;
+        particle.style.animationDelay = `${delay}s`;
+        particle.style.animationDuration = `${duration}s, 4s`;
+        
+        const floatKeyframes = `
+            @keyframes float-particle-${i} {
+              0% { transform: translate(0, 0); }
+              100% { transform: translate(${Math.random() * 50 - 25}vw, ${Math.random() * 50 - 25}vh); }
+            }
+        `;
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(floatKeyframes, styleSheet.cssRules.length);
+        particle.style.animationName = `float-particle-${i}, glow-particle`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    });
+  </script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    // Se añade update para incrementar los contadores
+    import { getDatabase, ref, onValue, update, increment } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQAfdb3O0GzkQTrpmqUmFq38szrf3PJhw",
@@ -131,24 +357,72 @@
     const overlay = document.getElementById('overlay');
     const tasksContainer = document.getElementById('tasks');
     const downloadBtn = document.getElementById('downloadBtn');
+    const visitorCounter = document.getElementById('visitor-counter');
 
+    // ====================================================================================
+    // 1. LÓGICA DEL CONTADOR DE VISITANTES EN TIEMPO REAL
+    // ====================================================================================
+    
+    // Incrementa el contador de visitantes al cargar la página (solo si no es la misma sesión)
+    if (!sessionStorage.getItem('visited')) {
+        const visitorRef = ref(db, 'stats/visitors');
+        update(visitorRef, { count: increment(1) })
+            .then(() => {
+                sessionStorage.setItem('visited', 'true');
+            })
+            .catch(error => console.error("Error al incrementar visitantes:", error));
+    }
+
+    // Escucha en tiempo real para mostrar el número de visitantes
+    onValue(ref(db, 'stats/visitors/count'), (snapshot) => {
+        const count = snapshot.val() || 0;
+        visitorCounter.textContent = `👁️ Visitantes en Total: ${count.toLocaleString('es-ES')}`;
+    });
+
+
+    // ====================================================================================
+    // 2. MOSTRAR POSTS Y CONTADOR DE DESCARGAS
+    // ====================================================================================
+    
     onValue(ref(db, 'posts'), (snapshot) => {
       postsContainer.innerHTML = '';
       snapshot.forEach(child => {
+        const key = child.key; // Obtener la clave única del post
         const data = child.val();
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <img src="${data.image}" alt="">
-          <h3>${data.title}</h3>
-          <button class="btn">Descargar</button>
-        `;
-        card.querySelector('.btn').addEventListener('click', () => openTasks(data));
-        postsContainer.appendChild(card);
+        
+        // Escucha en tiempo real para el contador de descargas de cada post
+        onValue(ref(db, `posts/${key}/downloads`), (downloadSnapshot) => {
+            const downloads = downloadSnapshot.val() || 0;
+            
+            // Recrear la tarjeta con el contador actualizado
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            card.innerHTML = `
+                <h3>${data.title}</h3>
+                <div class="download-count">⬇️ Descargas: ${downloads.toLocaleString('es-ES')}</div>
+                <button class="btn" data-key="${key}">Descargar</button>
+            `;
+            
+            // Reemplazar la tarjeta antigua con la nueva o añadirla si no existe
+            const existingCard = document.querySelector(`.card .btn[data-key="${key}"]`)?.closest('.card');
+            if (existingCard) {
+                postsContainer.replaceChild(card, existingCard);
+            } else {
+                postsContainer.appendChild(card);
+            }
+
+            // Añadir el evento click al botón de descarga
+            card.querySelector('.btn').addEventListener('click', () => openTasks(data, key));
+        });
       });
     });
 
-    function openTasks(data) {
+    // ====================================================================================
+    // 3. LÓGICA DEL POPUP Y CONTADOR DE DESCARGAS POR POST
+    // ====================================================================================
+
+    function openTasks(data, postKey) {
       overlay.style.display = 'flex';
       tasksContainer.innerHTML = '';
       downloadBtn.disabled = true;
@@ -160,10 +434,10 @@
         btn.textContent = t.name;
 
         btn.addEventListener('click', (e) => {
-          e.preventDefault(); // evita recarga
-          window.open(t.link, '_blank', 'noopener,noreferrer'); // abre en nueva pestaña
+          e.preventDefault();
+          window.open(t.link, '_blank', 'noopener,noreferrer');
           btn.disabled = true;
-          btn.style.background = '#16a34a'; // verde al completar
+          btn.style.background = '#16a34a';
           completed++;
           if (completed >= tasks.length) {
             downloadBtn.disabled = false;
@@ -173,7 +447,13 @@
         tasksContainer.appendChild(btn);
       });
 
+      // CAMBIO CLAVE: Incrementa el contador de descargas del post al hacer clic aquí.
       downloadBtn.onclick = () => {
+        // Incrementa el contador de descargas del post
+        const postRef = ref(db, `posts/${postKey}`);
+        update(postRef, { downloads: increment(1) })
+            .catch(error => console.error("Error al incrementar descargas:", error));
+            
         window.open(data.download, '_blank');
         overlay.style.display = 'none';
       };
