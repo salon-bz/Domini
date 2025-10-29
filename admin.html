@@ -1,533 +1,380 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Panel de Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    /* VARIABLES NEON */
-    :root {
-      --neon-blue: #00ffff;
-      --neon-green: #39ff14;
-      --neon-red: #ff073a;
-      --bg-dark: #0a0a2a;
-      --box-dark: #1a1a4a;
-      --input-dark: #2a2a6a;
-      --shadow-intensity: 0.6;
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>𝐃𝐑𝐈𝐏 𝐂𝐋𝐈𝐄𝐍𝐓 | 𝐌𝐎𝐁𝐈𝐋𝐄</title>
 
-    body {
-      background: var(--bg-dark);
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      padding: 20px;
-      text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      flex-direction: column;
-    }
-
-    /* ESTILOS DE CAJAS Y TITULOS */
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: var(--neon-blue);
-      text-shadow: 0 0 7px var(--neon-blue), 0 0 15px var(--neon-blue), 0 0 20px var(--neon-blue);
-    }
-
-    .box, .list, #loginContainer, #deniedContainer {
-      background: var(--box-dark);
-      border-radius: 16px;
-      padding: 30px;
-      max-width: 450px; /* Reducción de ancho para el login */
-      margin: 0 auto 20px auto;
-      box-shadow:
-        0 0 10px var(--neon-blue),
-        0 0 20px var(--neon-blue) inset;
-      border: 1px solid var(--neon-blue);
-    }
-
-    /* Ocultar el panel de admin por defecto */
-    #adminPanel {
-      display: none;
-      max-width: 700px; /* Ancho original para el panel */
-      width: 100%;
-      position: relative; /* Necesario para posicionar el botón de logout */
-    }
-
-    /* ESTILOS DE FORMULARIO */
-    label { display: block; margin-top: 15px; font-weight: 600; }
-    
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--neon-blue);
-      margin-top: 8px;
-      background: var(--input-dark);
-      color: #fff;
-      box-shadow: 0 0 5px var(--neon-blue) inset;
-    }
-    
-    /* BOTONES BASE Y NEÓN */
-    .btn {
-      width: 100%; /* Botones de login/registro a ancho completo */
-      margin-top: 20px;
-      padding: 12px 15px;
-      border: none;
-      border-radius: 8px;
-      color: var(--bg-dark);
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease-in-out;
-      background: var(--neon-green);
-      box-shadow: 0 0 5px var(--neon-green), 0 0 15px var(--neon-green), 0 0 20px var(--neon-green);
-    }
-
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 0 7px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
-    }
-
-    /* Botones de acción secundaria (Logout/Register) */
-    .btn-secondary {
-      background: var(--neon-red) !important;
-      box-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red);
-      width: auto;
-      margin-left: 10px;
-    }
-    .btn-secondary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0 7px var(--neon-red), 0 0 20px var(--neon-red), 0 0 30px var(--neon-red);
-    }
-
-    /* Botón de Logout en el panel de admin */
-    #logoutBtn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        width: auto;
-        margin-top: 0;
-        margin-left: 0;
-    }
-    
-    /* Botón de Publicaciones (nuevo) */
-    #togglePostsBtn {
-        width: auto;
-        margin-top: 20px;
-        margin-bottom: 20px; /* Separación de la lista */
-        padding: 10px 15px;
-        display: block; /* Para que tome el ancho y se centre si es necesario */
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 300px; /* Limitar ancho del botón */
-    }
-
-    /* ESTILOS DE ACCESO DENEGADO */
-    #deniedContainer {
-        text-align: center;
-        border-color: var(--neon-red);
-        box-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red) inset;
-    }
-    #deniedContainer h2 {
-        color: var(--neon-red);
-        text-shadow: 0 0 7px var(--neon-red), 0 0 15px var(--neon-red);
-    }
-    
-    /* ESTILOS INTERNOS DEL PANEL DE ADMIN (MANTENIDOS/AJUSTADOS) */
-    .tasks { margin-top: 20px; }
-    .task-item {
-      background: var(--input-dark);
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-      border-left: 5px solid var(--neon-blue);
-      box-shadow: 0 0 5px var(--neon-blue);
-    }
-    .post {
-      background: var(--box-dark);
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      border: 1px solid rgba(0, 255, 255, 0.5);
-      box-shadow: 0 0 7px rgba(0, 255, 255, 0.7);
-    }
-    .post-info { flex: 1; }
-    .post-info h3 { margin-top: 0; color: var(--neon-blue); }
-    .post .delete-btn {
-      background: var(--neon-red);
-      box-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red);
-      width: auto;
-    }
-    .post .edit-btn {
-      background: var(--neon-green) !important;
-      box-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green);
-      width: auto;
-    }
-    .post button:hover {
-        transform: translateY(-3px);
-    }
-    .post img { display: none; }
-    a.upload { display: none; }
-    
-    /* Ocultar el contenedor de publicaciones por defecto */
-    #postsListContainer {
-        display: none;
-        width: 100%;
-        max-width: 700px;
-        margin: auto;
-    }
-  </style>
-</head>
-<body>
-
-  <div id="deniedContainer" style="display:none;">
-      <h2>Acceso Denegado</h2>
-      <p>La cuota de administradores ha sido alcanzada. Solo los administradores registrados pueden acceder.</p>
-  </div>
-
-  <div id="loginContainer">
-    <h1>Acceso de Administrador</h1>
-    <label>Usuario</label>
-    <input type="text" id="loginUser">
-
-    <label>Contraseña</label>
-    <input type="password" id="loginPass">
-    
-    <button class="btn" id="loginBtn">Iniciar Sesión</button>
-    <button class="btn btn-secondary" id="registerBtn">Registrar</button>
-    <p id="loginMessage" style="text-align:center; color: var(--neon-red); margin-top:15px;"></p>
-  </div>
-
-  <div id="adminPanel">
-    <button class="btn btn-secondary" id="logoutBtn">Cerrar Sesión</button>
-    <h1>Panel de Administración</h1>
-
-    <div class="box" id="formBox">
-      <label>Título</label>
-      <input type="text" id="title">
-
-      <label>Link de Descarga (Mediafire u otro)</label>
-      <input type="text" id="download">
-
-      <div class="tasks" id="tasksContainer"></div>
-      <button class="btn" id="addTask">Agregar Botón (Ej: Unirse a TikTok)</button>
-
-      <button class="btn" id="save">Guardar Publicación</button>
-    </div>
-
-    <button class="btn" id="togglePostsBtn">Mostrar Publicaciones</button>
-
-    <div id="postsListContainer">
-        <div class="list" id="postsList">
-            <h2 style="text-align:center;">Publicaciones Existentes</h2>
-            </div>
-    </div>
-  </div>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.11.1/tsparticles.bundle.min.js"></script>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-    
-    // Configuración de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, update, push, set, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
     const firebaseConfig = {
-      apiKey: "AIzaSyAQAfdb3O0GzkQTrpmqUmFq38szrf3PJhw",
-      authDomain: "domini-6fae2.firebaseapp.com",
-      projectId: "domini-6fae2",
-      storageBucket: "domini-6fae2.firebasestorage.app",
-      messagingSenderId: "990218506087",
-      appId: "1:990218506087:web:a577eed88dea8882c0e9c2",
-      databaseURL: "https://domini-6fae2-default-rtdb.firebaseio.com/"
+      apiKey: "AIzaSyCV7fX9F52npHhdr0v1WMvsoupzVlzDebY",
+      authDomain: "princiapal-db0f0.firebaseapp.com",
+      projectId: "princiapal-db0f0",
+      storageBucket: "princiapal-db0f0.firebasestorage.app",
+      messagingSenderId: "656452231715",
+      appId: "1:656452231715:web:bcfacabe149805cf3dc796",
+      measurementId: "G-7H7HNRKDMW",
+      databaseURL: "https://princiapal-db0f0-default-rtdb.firebaseio.com/"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const contenedor = document.getElementById("productos");
 
-    // REFERENCIAS DE ELEMENTOS
-    const loginContainer = document.getElementById('loginContainer');
-    const adminPanel = document.getElementById('adminPanel');
-    const deniedContainer = document.getElementById('deniedContainer');
-    const loginUser = document.getElementById('loginUser');
-    const loginPass = document.getElementById('loginPass');
-    const loginMessage = document.getElementById('loginMessage');
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const togglePostsBtn = document.getElementById('togglePostsBtn'); 
-    const postsListContainer = document.getElementById('postsListContainer'); 
-
-    // REFERENCIAS DEL PANEL DE ADMIN
-    const tasksContainer = document.getElementById('tasksContainer');
-    const addTaskBtn = document.getElementById('addTask');
-    const saveBtn = document.getElementById('save');
-    const postsList = document.getElementById('postsList');
-
-    let tasks = [];
-    let editingId = null;
-
-    // --- FUNCIONES DE AUTENTICACIÓN ---
-
-    const ADMINS_REF = ref(db, 'admins');
-
-    async function checkAdminLimit() {
-        const snapshot = await get(ADMINS_REF);
-        return snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
-    }
-
-    function hashPassword(password) {
-        // **NOTA DE SEGURIDAD:** Uso de btoa() no es seguro para producción.
-        return btoa(password);
-    }
-
-    async function handleLogin() {
-        const user = loginUser.value.trim();
-        const pass = loginPass.value.trim();
-        loginMessage.textContent = '';
-
-        if (!user || !pass) {
-            loginMessage.textContent = 'Usuario y contraseña son requeridos.';
-            return;
-        }
-
-        try {
-            const hashedPassword = hashPassword(pass);
-            const snapshot = await get(ADMINS_REF);
-            let adminFound = false;
-
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    const admin = child.val();
-                    if (admin.user === user && admin.pass === hashedPassword) {
-                        adminFound = true;
-                    }
-                });
-            }
-
-            if (adminFound) {
-                localStorage.setItem('admin_session', user);
-                showAdminPanel();
-            } else {
-                loginMessage.textContent = 'Credenciales incorrectas.';
-            }
-        } catch (error) {
-            console.error("Error al iniciar sesión:", error);
-            loginMessage.textContent = 'Error al intentar iniciar sesión.';
-        }
-    }
-
-    async function handleRegister() {
-        const user = loginUser.value.trim();
-        const pass = loginPass.value.trim();
-        loginMessage.textContent = '';
-
-        if (!user || !pass) {
-            loginMessage.textContent = 'Usuario y contraseña son requeridos.';
-            return;
-        }
-
-        const currentAdmins = await checkAdminLimit();
-
-        if (currentAdmins >= 2) {
-            showDeniedScreen();
-            return;
-        }
-
-        try {
-            const hashedPassword = hashPassword(pass);
-
-            const snapshot = await get(ADMINS_REF);
-            let userExists = false;
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    if (child.val().user === user) {
-                        userExists = true;
-                    }
-                });
-            }
-
-            if (userExists) {
-                loginMessage.textContent = 'El nombre de usuario ya está en uso.';
-                return;
-            }
-
-            const newAdminRef = push(ADMINS_REF);
-            await set(newAdminRef, { user, pass: hashedPassword });
-            
-            localStorage.setItem('admin_session', user);
-            alert('Registro exitoso. Iniciando sesión...');
-            showAdminPanel();
-
-        } catch (error) {
-            console.error("Error al registrar:", error);
-            loginMessage.textContent = 'Error al intentar registrar.';
-        }
-    }
-
-    function handleLogout() {
-        localStorage.removeItem('admin_session');
-        window.location.reload();
-    }
-
-    // --- CONTROL DE VISTAS ---
-
-    function showAdminPanel() {
-        loginContainer.style.display = 'none';
-        deniedContainer.style.display = 'none';
-        adminPanel.style.display = 'block'; 
-        postsListContainer.style.display = 'none'; // Asegurar que esté oculto al iniciar
-        togglePostsBtn.textContent = 'Mostrar Publicaciones'; // Resetear texto del botón
-    }
-
-    function showLogin() {
-        loginContainer.style.display = 'block';
-        deniedContainer.style.display = 'none';
-        adminPanel.style.display = 'none';
-    }
-    
-    function showDeniedScreen() {
-        loginContainer.style.display = 'none';
-        deniedContainer.style.display = 'block';
-        adminPanel.style.display = 'none';
-    }
-
-    async function checkSession() {
-        const currentAdmins = await checkAdminLimit();
-        const session = localStorage.getItem('admin_session');
-        
-        if (currentAdmins >= 2 && !session) {
-             showDeniedScreen();
-        } else if (session) {
-            showAdminPanel();
-        } else {
-            showLogin();
-        }
-    }
-    
-    // --- LÓGICA DE MOSTRAR/OCULTAR PUBLICACIONES ---
-    
-    function togglePosts() {
-        if (postsListContainer.style.display === 'none' || postsListContainer.style.display === '') {
-            // Mostrar publicaciones
-            postsListContainer.style.display = 'block';
-            togglePostsBtn.textContent = 'Ocultar Publicaciones';
-            // Cargamos los posts solo cuando se muestran
-            loadPosts(); 
-        } else {
-            // Ocultar publicaciones
-            postsListContainer.style.display = 'none';
-            togglePostsBtn.textContent = 'Mostrar Publicaciones';
-        }
-    }
-
-
-    // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN (CRUD) ---
-
-    addTaskBtn.onclick = () => {
-      const name = prompt('Nombre del botón (Ej: Unirse a YouTube)');
-      const link = prompt('Link del botón');
-      if (name && link) {
-        tasks.push({ name, link });
-        renderTasks();
+    function renderEstrellas(id, rating) {
+      let estrellas = "";
+      for (let i = 1; i <= 5; i++) {
+        estrellas += `
+          <span class="estrella ${i <= rating ? 'activa' : ''}" data-id="${id}" data-valor="${i}">★</span>
+        `;
       }
-    };
-
-    function renderTasks() {
-      tasksContainer.innerHTML = '';
-      tasks.forEach((t) => {
-        const div = document.createElement('div');
-        div.className = 'task-item';
-        div.innerHTML = `${t.name} - <a href="${t.link}" target="_blank">${t.link}</a>`;
-        tasksContainer.appendChild(div);
-      });
+      return estrellas;
     }
 
-    saveBtn.onclick = () => {
-      const title = document.getElementById('title').value;
-      const download = document.getElementById('download').value;
-      const image = ""; 
+    function usuarioYaCalifico(id) {
+      const calificados = JSON.parse(localStorage.getItem("calificados") || "[]");
+      return calificados.includes(id);
+    }
 
-      if (!title || !download) {
-        alert('Completa todos los campos');
+    function guardarCalificacionLocal(id) {
+      const calificados = JSON.parse(localStorage.getItem("calificados") || "[]");
+      if (!calificados.includes(id)) {
+        calificados.push(id);
+        localStorage.setItem("calificados", JSON.stringify(calificados));
+      }
+    }
+
+    // === Mostrar productos y calificaciones ===
+    onValue(ref(db, "productos"), (snapshot) => {
+      contenedor.innerHTML = "";
+      const data = snapshot.val();
+      if (!data) return;
+
+      Object.entries(data).forEach(([id, producto]) => {
+        let preciosHTML = "";
+        if (producto.precios) {
+          producto.precios.forEach(precio => {
+            // --- INICIO DE LA MODIFICACIÓN ---
+            // Se crea el texto del mensaje incluyendo el titulo del producto y el precio.
+            const mensaje = `Hola me interesa el producto "${producto.titulo}" con el precio ${precio}.`;
+            // Se codifica el mensaje para que sea válido en la URL de WhatsApp.
+            const whatsappLink = `https://wa.me/573142369516?text=${encodeURIComponent(mensaje)}`;
+            
+            preciosHTML += `
+              <div class="precio-item">
+                <span>${precio}</span>
+                <a href="${whatsappLink}" target="_blank" class="btn-comprar">Comprar</a>
+              </div>`;
+            // --- FIN DE LA MODIFICACIÓN ---
+          });
+        }
+
+        const rating = producto.rating || 0;
+        const votos = producto.votos || 0;
+        const yaCalifico = usuarioYaCalifico(id);
+
+        contenedor.innerHTML += `
+          <div class="producto">
+            <img src="${producto.imagen}" alt="${producto.titulo}">
+            <h2>${producto.titulo}</h2>
+            <div class="rating-box" id="rating-${id}">
+              <div class="estrellas">${renderEstrellas(id, Math.round(rating))}</div>
+              <p class="rating-text">${rating.toFixed(1)} / 5 (${votos} votos)</p>
+              ${yaCalifico ? '' : `<button class="btn-calificar" data-id="${id}">Calificar</button>`}
+            </div>
+            <div class="precios">${preciosHTML}</div>
+          </div>`;
+      });
+
+      document.querySelectorAll(".btn-calificar").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const id = e.target.dataset.id;
+          const ratingBox = document.getElementById("rating-" + id);
+          const estrellasDiv = ratingBox.querySelector(".estrellas");
+          estrellasDiv.classList.add("activo");
+          e.target.style.display = "none";
+        });
+      });
+
+      document.querySelectorAll(".estrella").forEach(estrella => {
+        estrella.addEventListener("click", e => {
+          const id = e.target.dataset.id;
+          if (usuarioYaCalifico(id)) return;
+
+          const valor = parseInt(e.target.dataset.valor);
+          const productoRef = ref(db, "productos/" + id);
+
+          onValue(productoRef, (snap) => {
+            const prod = snap.val();
+            if (!prod) return;
+            const votos = (prod.votos || 0) + 1;
+            const nuevoRating = ((prod.rating || 0) * (votos - 1) + valor) / votos;
+
+            update(productoRef, { rating: nuevoRating, votos: votos }).then(() => {
+              guardarCalificacionLocal(id);
+              const ratingBox = document.getElementById("rating-" + id);
+              const estrellasDiv = ratingBox.querySelector(".estrellas");
+              const ratingText = ratingBox.querySelector(".rating-text");
+              estrellasDiv.classList.remove("activo");
+              estrellasDiv.innerHTML = renderEstrellas(id, Math.round(nuevoRating));
+              ratingText.textContent = `${nuevoRating.toFixed(1)} / 5 (${votos} votos)`;
+            });
+          }, { onlyOnce: true });
+        });
+      });
+    });
+
+    // === SISTEMA DE RESEÑAS ===
+    const reseñaInput = document.getElementById("reseñaTexto");
+    const nombreInput = document.getElementById("reseñaNombre");
+    const btnReseña = document.getElementById("btnReseña");
+    const listaReseñas = document.getElementById("listaReseñas");
+
+    btnReseña.addEventListener("click", () => {
+      const texto = reseñaInput.value.trim();
+      const nombre = nombreInput.value.trim();
+      if (texto.length === 0 || nombre.length === 0) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+      if (texto.length > 200 || nombre.length > 40) {
+        alert("El nombre debe tener máximo 40 caracteres y la reseña máximo 200.");
         return;
       }
 
-      const postData = { image, title, download, tasks };
+      const reseñasRef = ref(db, "reseñas");
+      const nuevaReseña = push(reseñasRef);
+      set(nuevaReseña, { nombre, texto, fecha: new Date().toLocaleString() })
+        .then(() => {
+          reseñaInput.value = "";
+          nombreInput.value = "";
+        })
+        .catch(() => alert("Error al guardar la reseña. Intenta de nuevo."));
+    });
 
-      if (editingId) {
-        const postRef = ref(db, 'posts/' + editingId);
-        update(postRef, postData);
-        alert('Publicación actualizada correctamente');
-        editingId = null;
-        saveBtn.textContent = 'Guardar Publicación';
-      } else {
-        const postRef = push(ref(db, 'posts'));
-        set(postRef, postData);
-        alert('Publicación guardada correctamente');
+    // Mostrar TODAS las reseñas, borrar las más viejas si pasan de 100
+    onValue(ref(db, "reseñas"), (snapshot) => {
+      listaReseñas.innerHTML = "";
+      const data = snapshot.val();
+      if (!data) {
+        listaReseñas.innerHTML = "<p>No hay reseñas aún.</p>";
+        return;
       }
 
-      resetForm();
-    };
-
-    function resetForm() {
-      document.getElementById('title').value = '';
-      document.getElementById('download').value = '';
-      tasks = [];
-      renderTasks();
-    }
-
-    function loadPosts() {
-        // La función onValue se mantendrá activa para actualizar la lista si se está viendo.
-        onValue(ref(db, 'posts'), (snapshot) => {
-            postsList.innerHTML = '<h2 style="text-align:center;">Publicaciones Existentes</h2>';
-            snapshot.forEach(child => {
-                const data = child.val();
-                const id = child.key;
-                const div = document.createElement('div');
-                div.className = 'post';
-                div.innerHTML = `
-                    <div class="post-info">
-                        <h3>${data.title}</h3>
-                        <p>${data.tasks ? data.tasks.length : 0} botones</p>
-                    </div>
-                    <button class="edit-btn">Editar</button>
-                    <button class="delete-btn">Eliminar</button>
-                `;
-
-                div.querySelector('.delete-btn').addEventListener('click', () => {
-                    if (confirm('¿Seguro que deseas eliminar esta publicación?')) {
-                        remove(ref(db, 'posts/' + id));
-                    }
-                });
-
-                div.querySelector('.edit-btn').addEventListener('click', () => {
-                    document.getElementById('title').value = data.title;
-                    document.getElementById('download').value = data.download;
-                    tasks = data.tasks || [];
-                    renderTasks();
-                    editingId = id;
-                    saveBtn.textContent = 'Guardar Cambios';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-
-                postsList.appendChild(div);
-            });
+      const reseñasEntries = Object.entries(data);
+      // Si hay más de 100 reseñas, eliminar las más viejas
+      if (reseñasEntries.length > 100) {
+        const sobrantes = reseñasEntries.length - 100;
+        const reseñasViejas = reseñasEntries.slice(0, sobrantes);
+        reseñasViejas.forEach(([key]) => {
+          remove(ref(db, "reseñas/" + key));
         });
+      }
+
+      // Mostrar todas (las más recientes primero)
+      const reseñasArray = reseñasEntries.slice(-100).reverse();
+      reseñasArray.forEach(([id, r]) => {
+        listaReseñas.innerHTML += `
+          <div class="reseña">
+            <h4>${r.nombre}</h4>
+            <p>${r.texto}</p>
+            <span>${r.fecha}</span>
+          </div>`;
+      });
+    });
+
+    // === FONDO DE PARTÍCULAS ===
+    window.onload = () => {
+      tsParticles.load("tsparticles", {
+        background: { color: "#000" },
+        particles: {
+          number: { value: 80 },
+          color: { value: "#00ffff" },
+          shape: { type: "circle" },
+          opacity: { value: 0.5 },
+          size: { value: 3 },
+          move: { enable: true, speed: 1 },
+          links: { enable: true, color: "#00ffff", opacity: 0.4, distance: 120 }
+        }
+      });
+    };
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+    }
+    h1, h3 {
+      text-align: center;
+      color: #00ffff;
+      text-shadow: 0 0 15px #00ffff;
+      z-index: 2;
+      position: relative;
+    }
+    #tsparticles {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      top: 0;
+      left: 0;
+    }
+    #productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      padding: 20px;
+      z-index: 2;
+      position: relative;
+    }
+    .producto {
+      background: rgba(0,0,20,0.8);
+      border: 1px solid #0ff;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #00ffff55;
+      padding: 10px;
+      text-align: center;
+      transition: transform .3s;
+      max-width: 250px;
+      margin: 0 auto;
+    }
+    .producto:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 35px #00ffffaa;
+    }
+    .producto img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .precio-item {
+      margin: 6px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9em;
+    }
+    .btn-comprar {
+      background: #00ffff33;
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      padding: 4px 8px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: .3s;
+    }
+    .btn-comprar:hover {
+      background: #00ffff;
+      color: #000;
+      box-shadow: 0 0 15px #00ffff;
     }
 
-    // --- LISTENERS E INICIO ---
-    loginBtn.addEventListener('click', handleLogin);
-    registerBtn.addEventListener('click', handleRegister);
-    logoutBtn.addEventListener('click', handleLogout);
-    togglePostsBtn.addEventListener('click', togglePosts); 
+    .rating-box { margin-bottom: 10px; }
+    .estrellas {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 5px;
+      pointer-events: none;
+    }
+    .estrellas.activo { pointer-events: auto; }
+    .estrella { font-size: 20px; color: #555; cursor: pointer; transition: 0.3s; }
+    .estrella:hover, .estrella.activa { color: #ff0; text-shadow: 0 0 10px #ff0; }
+    .rating-text { font-size: 0.85em; color: #aaa; margin-bottom: 5px; }
+    .btn-calificar {
+      background: #00ffff33; border: 1px solid #00ffff; color: #00ffff;
+      padding: 4px 10px; border-radius: 10px; cursor: pointer; transition: .3s;
+    }
+    .btn-calificar:hover { background: #00ffff; color: #000; box-shadow: 0 0 15px #00ffff; }
 
-    checkSession();
-  </script>
+    /* BOX DE RESEÑAS */
+    #reseñas {
+      background: rgba(0,0,20,0.85);
+      border: 2px solid #00ffff;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      box-shadow: 0 0 25px #00ffff55;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    #reseñas input, #reseñas textarea {
+      width: 90%;
+      background: #000;
+      border: 1px solid #00ffff;
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px;
+      margin: 5px;
+    }
+    #reseñas button {
+      background: #00ffff33;
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      padding: 8px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .3s;
+    }
+    #reseñas button:hover { background: #00ffff; color: #000; box-shadow: 0 0 15px #00ffff; }
+    #listaReseñas {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #00ffff #000;
+    }
+    #listaReseñas::-webkit-scrollbar { width: 6px; }
+    #listaReseñas::-webkit-scrollbar-thumb { background: #00ffff; border-radius: 10px; }
+    .reseña {
+      border: 1px solid #00ffff44;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px auto;
+      width: 90%;
+      background: rgba(0,255,255,0.05);
+      box-shadow: 0 0 10px #00ffff22;
+    }
+    .reseña h4 { color: #00ffff; margin: 0; }
+    .reseña p { margin: 5px 0; color: #fff; }
+    .reseña span { font-size: 0.8em; color: #aaa; }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 0.9em;
+      z-index: 2;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div id="tsparticles"></div>
+  <h1>𝐃𝐑𝐈𝐏 𝐂𝐋𝐈𝐄𝐍𝐓 | 𝐌𝐎𝐁𝐈𝐋𝐄</h1>
+  <h3>OFERTAS Y BENEFICIOS</h3>
+  <div id="productos"></div>
+
+  <section id="reseñas">
+    <h3>💬 Deja tu reseña</h3>
+    <input type="text" id="reseñaNombre" placeholder="Tu nombre (máx. 40)" maxlength="40"><br>
+    <textarea id="reseñaTexto" placeholder="Escribe tu reseña (máx. 200)" maxlength="200"></textarea><br>
+    <button id="btnReseña">Dejar reseña</button>
+    <div id="listaReseñas"></div>
+  </section>
+
+  <footer>© 2024 - 2025 𝐋𝐔𝐂𝐊 𝐗!𝐓</footer>
 </body>
 </html>
