@@ -31,6 +31,54 @@
       min-height: 100vh;
     }
 
+    /* Estilos del LOADER (Pantalla de Carga) */
+    #loader-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--dark-bg); /* Fondo oscuro */
+      z-index: 100; /* Asegura que esté por encima de todo */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s ease;
+    }
+
+    #loader-text {
+      font-size: 2em;
+      font-weight: 600;
+      margin-top: 20px;
+      color: var(--neon-blue);
+      text-shadow: var(--neon-shadow-blue);
+      animation: pulse-title 3s infinite alternate;
+    }
+
+    /* Estilos del Spinner que Gira */
+    .spinner {
+      border: 8px solid rgba(255, 255, 255, 0.1);
+      border-top: 8px solid var(--neon-pink); /* Color neón del giro */
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite, glow-spinner 2s infinite alternate;
+      box-shadow: 0 0 15px var(--neon-pink);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes glow-spinner {
+      0% { box-shadow: 0 0 5px var(--neon-pink), 0 0 10px var(--neon-pink); }
+      100% { box-shadow: 0 0 20px var(--neon-pink), 0 0 40px rgba(236, 72, 153, 0.6); }
+    }
+    /* FIN Estilos del LOADER */
+
+
     /* Estilos del contador de visitantes */
     #visitor-counter {
       text-align: center;
@@ -272,6 +320,10 @@
   </style>
 </head>
 <body>
+  <div id="loader-screen">
+    <div class="spinner"></div>
+    <div id="loader-text">CARGANDO...</div>
+  </div>
   <div class="neon-particles" id="neonParticles"></div>
 
   <h1>𝐃𝐎𝐌𝐈𝐍𝐈𝐂𝐀𝐍𝐈𝐓𝐎 𝐌𝐎𝐃𝐙 𝐗𝐈𝐓 🔥😩</h1>
@@ -358,6 +410,7 @@
     const tasksContainer = document.getElementById('tasks');
     const downloadBtn = document.getElementById('downloadBtn');
     const visitorCounter = document.getElementById('visitor-counter');
+    const loaderScreen = document.getElementById('loader-screen'); // NUEVO: Referencia al loader
 
     // ====================================================================================
     // 1. LÓGICA DEL CONTADOR DE VISITANTES EN TIEMPO REAL
@@ -381,20 +434,19 @@
 
 
     // ====================================================================================
-    // 2. MOSTRAR POSTS Y CONTADOR DE DESCARGAS
+    // 2. MOSTRAR POSTS Y CONTADOR DE DESCARGAS (CON ORDEN INVERSO Y OCULTAR LOADER)
     // ====================================================================================
     
     onValue(ref(db, 'posts'), (snapshot) => {
       postsContainer.innerHTML = '';
-      snapshot.forEach(child => {
-        const key = child.key; // Obtener la clave única del post
+      
+      snapshot.forEach(child => { 
+        const key = child.key;
         const data = child.val();
         
-        // Escucha en tiempo real para el contador de descargas de cada post
         onValue(ref(db, `posts/${key}/downloads`), (downloadSnapshot) => {
             const downloads = downloadSnapshot.val() || 0;
             
-            // Recrear la tarjeta con el contador actualizado
             const card = document.createElement('div');
             card.className = 'card';
             
@@ -404,18 +456,25 @@
                 <button class="btn" data-key="${key}">Descargar</button>
             `;
             
-            // Reemplazar la tarjeta antigua con la nueva o añadirla si no existe
             const existingCard = document.querySelector(`.card .btn[data-key="${key}"]`)?.closest('.card');
             if (existingCard) {
                 postsContainer.replaceChild(card, existingCard);
             } else {
-                postsContainer.appendChild(card);
+                // Inserta la tarjeta al principio para que el más nuevo esté arriba
+                postsContainer.prepend(card); 
             }
 
             // Añadir el evento click al botón de descarga
             card.querySelector('.btn').addEventListener('click', () => openTasks(data, key));
         });
       });
+
+      // *** CAMBIO CLAVE AQUÍ: Ocultar el Loader después de cargar los posts ***
+      // Se utiliza una pequeña transición CSS de opacidad para un efecto más suave.
+      loaderScreen.style.opacity = '0';
+      setTimeout(() => {
+          loaderScreen.style.display = 'none';
+      }, 500); // 500ms es el tiempo de la transición de opacidad.
     });
 
     // ====================================================================================
@@ -447,9 +506,8 @@
         tasksContainer.appendChild(btn);
       });
 
-      // CAMBIO CLAVE: Incrementa el contador de descargas del post al hacer clic aquí.
+      // Incrementa el contador de descargas del post al hacer clic en "Ir a Descargar"
       downloadBtn.onclick = () => {
-        // Incrementa el contador de descargas del post
         const postRef = ref(db, `posts/${postKey}`);
         update(postRef, { downloads: increment(1) })
             .catch(error => console.error("Error al incrementar descargas:", error));
